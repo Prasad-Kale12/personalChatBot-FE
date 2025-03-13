@@ -16,9 +16,9 @@
           </div>
         </div>
         <div class="input-box-container">
-          <input :disabled="isLoading" type="text" v-model="message" placeholder="Type your message here..."
+          <input :disabled="isLoading" type="text" v-model="message" placeholder="Ask question to Prasad's assistant..."
             @keyup.enter="sendMessage" />
-          <button v-if="!isLoading" @click="sendMessage">Send</button>
+          <button :disabled="isLoading" @click="sendMessage">Send</button>
         </div>
       </div>
     </div>
@@ -41,8 +41,8 @@ export default {
   },
   methods: {
     async sendMessage() {
-      this.isLoading = true;
       if (this.message.trim() !== "") {
+        this.isLoading = true;
         this.messages.push({ text: this.message, type: "user-message" });
         this.scrollToBottom()
         const mesg = this.message;
@@ -81,24 +81,16 @@ export default {
   padding: 20px;
 }
 
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  100% {
-    background-position: 100% 50%;
-  }
-}
-
 .chat-container {
   display: flex;
   width: 60%;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
+/* Left Section */
 .left-section {
   width: 40%;
   display: flex;
@@ -109,17 +101,14 @@ export default {
   border-bottom-left-radius: 12px;
   animation: gradientAnimation 3s infinite alternate;
 }
-.grayAutomation {
-  width: 40%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #dad9db, #ecdcc9);
-  border-top-left-radius: 12px;
-  border-bottom-left-radius: 12px;
-  animation: gradientAnimation 3s infinite alternate;
+
+.avatar {
+  width: 80%;
+  max-width: 250px;
+  border-radius: 10%;
 }
 
+/* Right Section */
 .right-section {
   width: 60%;
   display: flex;
@@ -129,12 +118,6 @@ export default {
 
 .header {
   text-align: center;
-}
-
-.avatar {
-  width: 80%;
-  max-width: 250px;
-  border-radius: 10%;
 }
 
 .chat-box {
@@ -150,6 +133,7 @@ export default {
   gap: 1rem;
 }
 
+/* Messages */
 .user-message {
   background: linear-gradient(135deg, #a578ec, #c7aed8);
   color: white;
@@ -158,13 +142,11 @@ export default {
   max-width: 80%;
   align-self: flex-end;
   animation: gradientAnimation 3s infinite alternate;
-
 }
 
 .ai-message {
   background: linear-gradient(135deg, #e03a50, #eba197);
   animation: gradientAnimation 3s infinite alternate;
-
   color: white;
   padding: 10px;
   border-radius: 10px;
@@ -172,9 +154,11 @@ export default {
   align-self: flex-start;
 }
 
+/* Input Box */
 .input-box-container {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 input {
@@ -182,6 +166,7 @@ input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 14px;
 }
 
 button {
@@ -195,7 +180,55 @@ button {
   transition: background 0.3s;
 }
 
-button:hover {
-  background: linear-gradient(135deg, #e03a50, #eba197);
+
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  .chat-container {
+    width: 90%;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-section {
+    width: 100%;
+    height: 150px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .avatar {
+    width: 60%;
+    border-radius: 60%;
+    max-width: 150px;
+  }
+
+  .right-section {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .chat-box {
+    height: 250px;
+  }
+
+  .input-box-container {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+  }
 }
+
 </style>
