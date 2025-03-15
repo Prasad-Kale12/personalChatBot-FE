@@ -12,7 +12,7 @@
         </section>
         <div class="chat-box" ref="chatBox">
           <div v-for="(msg, index) in messages" :key="index" :class="msg.type">
-            <p>{{ msg.text }}</p>
+            <p :class="msg.type === 'loading-message' ? 'dots': ''">{{ msg.text }}</p>
           </div>
         </div>
         <div class="input-box-container">
@@ -28,7 +28,6 @@
 
 <script>
 import { getMessageFromAssistant } from "../routes/assistantServices";
-import { photos } from '../utils/photos'
 
 export default {
   data() {
@@ -41,38 +40,77 @@ export default {
   },
   methods: {
     async sendMessage() {
-      if (this.message.trim() !== "") {
-        this.isLoading = true;
-        this.messages.push({ text: this.message, type: "user-message" });
-        this.scrollToBottom()
-        const mesg = this.message;
-        this.message = "";
-        const res = await getMessageFromAssistant(mesg);
-
+      if (this.message.trim() === "") return;
+      
+      this.isLoading = true;
+      this.messages.push({ text: this.message, type: "user-message" });
+      this.scrollToBottom();
+      
+      const mes = this.message;
+      this.message = "";
+      
+      this.messages.push({ text: "...", type: "loading-message" });
+      this.scrollToBottom();
+      
+      try {
+        const res = await getMessageFromAssistant(mes);
+        this.messages.pop();
         this.messages.push({
           text: res.status === 200 && res.data.message ? res.data.message : "Sorry, I couldn't understand your question",
           type: "ai-message"
         });
-        this.isLoading = false;
-         this.scrollToBottom()
+      } catch (error) {
+        this.messages.pop();
+        this.messages.push({ text: "Error retrieving response try again", type: "ai-message" });
       }
+      
+      this.isLoading = false;
+      this.scrollToBottom();
     },
-    getRandomImage() {
-
-      return photos[Math.floor(Math.random() * photos.length)];
-    },
-
     scrollToBottom() {
       this.$nextTick(() => {
-        const chatBox = this.$refs.chatBox;
-        chatBox.scrollTop = chatBox.scrollHeight;
+        this.$refs.chatBox.scrollTop = this.$refs.chatBox.scrollHeight;
       });
     }
+
   }
 };
 </script>
 
 <style scoped>
+.loading-message .dots p:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-message .dots p:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-message .dots p:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.loading-message .dots {
+  display: inline-block;
+  animation: bounce 1.5s infinite;
+}
+.loading-message {
+  display: inline-block;
+  background: linear-gradient(135deg, #e03a50, #eba197);
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+  align-self: flex-start;
+  /* animation: bounce 1.5s infinite; */
+}
 .main-container {
   display: flex;
   justify-content: center;
